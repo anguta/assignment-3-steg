@@ -133,6 +133,7 @@ async def encode_post(
     ext = ext.lower().lstrip('.')
     if ext in ('jpg', 'jpeg', 'gif'):
         img = Image.open(io.BytesIO(user_file_data))
+        img = img.resize((img.width // 2, img.height // 2))
         byte_arr = io.BytesIO()
         img.save(byte_arr, format='BMP')
         user_file_data = byte_arr.getvalue()
