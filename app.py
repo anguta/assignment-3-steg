@@ -189,7 +189,7 @@ def postings():
     return result
 
 @app.get('/postings/{post_id}')
-def posting(post_id: int):
+def posting(post_id):
     db = database()
     row = db.execute(
         "SELECT p.*, u.username FROM postings p JOIN users u ON p.user_id=u.id WHERE p.id=?", (post_id,)
@@ -199,7 +199,7 @@ def posting(post_id: int):
     return dict(row)
 
 @app.get('/postings/{post_id}/file')
-def posting_file(post_id: int):
+def posting_file(post_id):
     db = database()
     row = db.execute("SELECT * FROM postings WHERE id=?", (post_id,)).fetchone()
     db.close()
