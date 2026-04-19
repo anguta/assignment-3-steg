@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Steganography</title>
+    </head>
+    <body>
+        <a href="/">Postings</a> | <button onclick="logout()">Logout</button>
+        <p id="user_msg"></p>
+
+        <h1>Encode</h1>
+        <form onsubmit="encode(event)">
+            <label>User file (P): <input type="file" id="user_file" required onchange="detectS('user_file', 's')"></label>
+            <label>Message file (M): <input type="file" id="message" required></label>
+            <label>S: starting bit: <input type="number" id="s" required></label>
+            <label>L: periodicity: <input type="number" id="l" required></label>
+            <label>C: cycling values (e.g. 8 or 8,16,28): <input type="text" id="c" required></label>
+            <button type="submit">Encode and Post</button>
+        </form>
+        <p id="encode_msg"></p>
+
+        <h1>Decode</h1>
+        <form onsubmit="decode(event)">
+            <label>Stego file: <input type="file" id="steg_file" required onchange="detectS('steg_file', 'decode_s')"></label>
+            <label>S: starting bit: <input type="number" id="decode_s" required></label>
+            <label>L: periodicity: <input type="number" id="decode_l" required></label>
+            <label>C: cycling values: <input type="text" id="decode_c" required></label>
+            <button type="submit">Decode</button>
+        </form>
+        <p id="decode_msg"></p>
+
+        <script>
+            if (!localStorage.getItem('token')) {
+                window.location.href = '/login'
+            }
+
+            document.getElementById('user_msg').innerText = 'logged in as ' + localStorage.getItem('username')
+
+            const HEADER_BITS = {
+                png: 1024, bmp: 434, gif: 800, jpg: 160, jpeg: 160,
+                tiff: 256, wav: 352, mp3: 256, flac: 512, mp4: 1024, 
+                mov: 1024, avi: 256, pdf: 400, txt: 0, bin: 0, ogg: 512
+            }
+
+            function detectS(filename, input) {
+                const file = document.getElementById(filename).files[0]
+                if (!file) return
+                const ext = file.name.split('.').pop().toLowerCase()
+                document.getElementById(input).value = HEADER_BITS[ext] !== undefined ? HEADER_BITS[ext] : 256
+            }
+
+            async function encode(e) {
+                e.preventDefault()
+                const form = new FormData()
+                form.append('user_file', document.getElementById('user_file').files[0])
+                form.append('message', document.getElementById('message').files[0])
+                form.append('s', document.getElementById('s').value)
+                form.append('l', document.getElementById('l').value)
+                form.append('c', document.getElementById('c').value)
+                const token = localStorage.getItem('token')
+                const response = await fetch('/encode', {method: 'POST', headers: { 'Authorization': token }, body: form})
+                const data = await response.json()
+                document.getElementById('encode_msg').innerText = JSON.stringify(data)
+            }
+            
+            function getExtension(bytes) {
+                if (bytes[0] === 0x89 && bytes[1] === 0x50) return 'png'
+                if (bytes[0] === 0xFF && bytes[1] === 0xD8) return 'jpg'
+                if (bytes[0] === 0x47 && bytes[1] === 0x49) return 'gif'
+                if (bytes[0] === 0x25 && bytes[1] === 0x50) return 'pdf'
+                return 'bin'
+            }
+
+            async function decode(e) {
+                e.preventDefault()
+                const form = new FormData()
+                form.append('steg_file', document.getElementById('steg_file').files[0])
+                form.append('s', document.getElementById('decode_s').value)
+                form.append('l', document.getElementById('decode_l').value)
+                form.append('c', document.getElementById('decode_c').value)
+                const response = await fetch('/decode', { method: 'POST', body: form })
+                const data = await response.json()
+                if (data.type === 'text') {
+                    document.getElementById('decode_msg').innerText = data.message
+                } else if (data.type === 'binary') {
+                    const bytes = new Uint8Array(data.message.match(/.{1,2}/g).map(b => parseInt(b, 16)))
+                    const ext = getExtension(bytes)
+                    const blob = new Blob([bytes])
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `decoded_message.${ext}`
+                    a.click()
+                    document.getElementById('decode_msg').innerText = `file downloaded as decoded_message.${ext}`
+                } else {
+                    document.getElementById('decode_msg').innerText = data.detail
+                }
+            }
+
+            async function logout() {
+                const token = localStorage.getItem('token')
+                await fetch('/logout', { method: 'POST', headers: {'Authorization': token }})
+                localStorage.removeItem('token')
+                localStorage.removeItem('username')
+                window.location.href = '/login'
+            }
+        </script>
+    </body>
+</html>

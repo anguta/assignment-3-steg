@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Register</title>
+    </head>
+    <body>
+        <h1>Register</h1>
+        <a href="/">Postings</a> | <a href="/login">Login</a>
+
+        <form onsubmit="register(event)">
+            <label>Username: <input type="text" id="username" required></label>
+            <label>Password: <input type="password" id="password" required></label>
+            <button type="submit">Register</button>
+        </form>
+        <p id="msg"></p>
+
+        <script>
+            async function register(e) {
+                e.preventDefault()
+                const form = new FormData()
+                form.append('username', document.getElementById('username').value)
+                form.append('password', document.getElementById('password').value)
+                const response = await fetch('/register', {method: 'POST', body: form})
+                const data = await response.json()
+                document.getElementById('msg').innerText = data.message || data.detail
+                if (data.message) {
+                    window.location.href = '/login'
+                }
+            }
+        </script>
+    </body>
+</html>

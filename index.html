@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Steganography Site</title>
+    </head>
+    <body>
+        <h1>Steganography Site</h1>
+        <a href="/login">Login</a> | <a href="/register">Register</a> | <a href="/main">Main</a>
+
+        <h2>Postings</h2>
+        <div id="postings"></div>
+
+        <script>
+            async function loadPostings() {
+                const response = await fetch('/postings')
+                const posts = await response.json()
+                const postings = document.getElementById('postings')
+                postings.innerHTML = ''
+                for (const post of posts) {
+                    postings.innerHTML += `
+                        <div>
+                            <img src="/postings/${post.id}/file" width="400">
+                            <p>by ${post.username}</p>
+                            <a href="/postings/${post.id}/file" download>download file</a>
+                        </div>
+                        <hr>
+                    `
+                }
+            }
+            
+            loadPostings()
+        </script>
+    </body>
+</html>
