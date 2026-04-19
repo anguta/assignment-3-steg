@@ -205,3 +205,27 @@ def posting_file(post_id: int):
     db.close()
 
     return FileResponse(os.path.join(UPLOAD_DIR, row['filename']), media_type=row['filetype'])
+
+'''SOURCES
+I used Claude AI for guidance and helping me with bugs. This was my first time working with a database in python and fastapi so I needed some guidance. There was no copying. 
+Especially with the SQL and converting to bmp I needed the most guidance.
+All work is my own.
+
+I used the python code to help me get an idea where to start and what exactly stegonagrophy is.
+
+https://thepythoncode.com/article/hide-secret-data-in-images-using-steganography-python
+https://claude.ai
+https://passlib.readthedocs.io/
+https://fastapi.tiangolo.com/
+https://graphics.stanford.edu/~seander/bithacks.html
+https://github.com/scott-griffiths/bitstring
+https://www-users.cs.umn.edu/~hoppernj/tc-stego.pdf
+https://www.wired.com/story/steganography-hacker-lexicon/
+
+these were used for guidance and reference. not copying full code implementations. 
+so far all specifications have been met as stated in lecture and on the assignment pdf. 
+
+Discuss how someone could find M or P, given only L
+
+Someone could find M or P with only L by 
+'''
