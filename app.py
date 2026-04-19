@@ -14,7 +14,7 @@ from steg import encode, decode as steg_decode
 app = FastAPI()
 pwd = CryptContext(schemes=["bcrypt"])
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = "/home/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 FILE_EXT = {
@@ -25,7 +25,7 @@ FILE_EXT = {
 }
 
 def database():
-    db = sqlite3.connect("steg.db")
+    db = sqlite3.connect("/home/steg.db")
     db.row_factory = sqlite3.Row
     return db
 
