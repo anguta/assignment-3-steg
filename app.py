@@ -227,5 +227,7 @@ so far all specifications have been met as stated in lecture and on the assignme
 
 Discuss how someone could find M or P, given only L
 
-Someone could find M or P with only L by 
+Someone could find M or P with only L by seeing how long it takes to go through the file and brute forcing.
+And keep repeating that until they know S or C. S is relatively small and files always have their own fixed size. WIth that information the attacker can brute force all possible values to find M. 
+By brute forcing S it can lead to M and P is
 '''
