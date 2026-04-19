@@ -14,7 +14,7 @@ from steg import encode, decode as steg_decode
 app = FastAPI()
 pwd = CryptContext(schemes=["bcrypt"])
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = "/home/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 FILE_EXT = {
@@ -25,7 +25,7 @@ FILE_EXT = {
 }
 
 def database():
-    db = sqlite3.connect("steg.db")
+    db = sqlite3.connect("/home/steg.db")
     db.row_factory = sqlite3.Row
     return db
 
@@ -166,7 +166,9 @@ async def encode_post(
 @app.post('/decode')
 async def decode_post(steg_file: UploadFile = File(...), s: int = Form(...), l: int = Form(...), c: str = Form(...)):
     steg_data = await steg_file.read()
-    c_list = [int(x.strip()) for x in c.split(',')]
+    c_list = []
+    for x in c.split(','):
+        c_list.append(int(x.strip()))
 
     try:
         decoded = steg_decode(steg_data, s, l, c_list)
